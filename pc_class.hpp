@@ -26,10 +26,10 @@ public:
   float* points;
   float* normals;
   uint8* colors;
-  uint8* mask;
+  // uint8* mask;
 
 private:
-  bool preprocess_nan;
+  // bool preprocess_nan;
   KDTree kdtree;
   void read_ply(char* path);
   void read_xyzm(char* paht);
