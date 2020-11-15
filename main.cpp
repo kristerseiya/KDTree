@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include "pc_class.hpp"
+#include "geometry3d.hpp"
 #include "utils.hpp"
 #include <omp.h>
 

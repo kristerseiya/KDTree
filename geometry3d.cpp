@@ -1,5 +1,5 @@
 #include "kdtree.hpp"
-#include "pc_class.hpp"
+#include "geometry3d.hpp"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
