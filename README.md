@@ -15,12 +15,12 @@ See include/kdtree/kdtree.h to see the structure of KDTree class. \
 Construct KDTree object with or without the data array
 ```C++
 KDTree<double>::KDTree();
-KDTree<double>::KDTree(const T* data, int dim, size_t num);
+KDTree<double>::KDTree(const double* data, int dim, size_t num);
 KDTree<double>::KDTree(const std::vector<T>& data, int dim); 
 ```
 To change or assign data after construction
 ```C++
-KDTree<double>::set(const T* data, int dim, size_t num);
+KDTree<double>::set(const double* data, int dim, size_t num);
 ```
 You can also use ```KDTree<float> ``` if you want to use ```float``` type instead. \
 To perform search, run one of the following member functions. \
@@ -28,20 +28,20 @@ These functions will return the number of nodes visited during the search. \
 **Pass only one query at a time.**
 ```C++
 // K Nearest Neighbor Search
-int KDTree<double>::searchKNN(const std::vector<T>& query, 
+int KDTree<double>::searchKNN(const std::vector<double>& query, 
                               const int k,
                               std::vector<size_t>& neighbor_idx,
-                              std::vector<T>& distances);
+                              std::vector<double>& distances);
 // Radius Search
-int KDTree<double>::searchRadius(const std::vector<T>& query, 
-                                 const T radius,
+int KDTree<double>::searchRadius(const std::vector<double>& query, 
+                                 const double radius,
                                  std::vector<size_t>& neighbor_idx,
-                                 std::vector<T>& distances);
+                                 std::vector<double>& distances);
 // Both K Nearest and Radius Search
-int KDTree<double>::searchHybrid(const std::vector<T>& query, 
-                                 const T radius,
+int KDTree<double>::searchHybrid(const std::vector<double>& query, 
+                                 const double radius,
                                  std::vector<size_t>& neighbor_idx,
-                                 std::vector<T>& distances,
+                                 std::vector<double>& distances,
                                  size_t max_neighbors = 0);
 ```
 ```std::vector<size_t> neighbor_idx``` will store the indices of the data. \
@@ -58,5 +58,5 @@ kdt = KDTree()
 kdt.assign('''n x m numpy array''')
 idx, dist = kdt.searchKNN(query, k :int)
 idx, dist = kdt.searchRadius(query, radius :double)
-idx, dist = kdt.searchHyBrid(query, radius :int, max_k :int)
+idx, dist = kdt.searchHyBrid(query, radius :double, max_k :int)
 ```
