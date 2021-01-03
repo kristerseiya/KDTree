@@ -16,7 +16,7 @@ Construct KDTree object with or without the data array
 ```C++
 KDTree<double>::KDTree();
 KDTree<double>::KDTree(const double* data, int dim, size_t num);
-KDTree<double>::KDTree(const std::vector<T>& data, int dim); 
+KDTree<double>::KDTree(const std::vector<double>& data, int dim); 
 ```
 To change or assign data after construction
 ```C++
