@@ -5,7 +5,7 @@ KDTree for K Nearest Search and Radius Search in C++ and Python. **Faster build 
 Use CMAKE to build the library. \
 First, edit CMakeLists.txt for configuration.
 ```bash
-mkdir build && cmake ..
+mkdir build && cd build && cmake ..
 ```
 No 3rd party libraries required for C++ \
 Pybind11 is required for building python interface.
