@@ -26,12 +26,12 @@ public:
         if (data_ == nullptr) {
             throw std::runtime_error("Data is not assigned");
         }
-        if ((query.ndim() == 1)||(query.shape(0) != dimension_)) {
-            throw std::runtime_error("Query must be a shape of (1, dimension)");
+        if ((query.ndim() != 1)||(query.shape(0) != dimension_)) {
+            throw std::runtime_error("Query must be a shape of ("+ std::to_string(dimension_) +",)");
         }
         std::vector<size_t> neighbor_idx;
         std::vector<double> distances;
-        this->searchKNN(std::vector<double>(query.data(),query.data()+query.shape(1)),
+        this->searchKNN(std::vector<double>(query.data(),query.data()+query.shape(0)),
                         k, neighbor_idx, distances);
         py::array_t<size_t> py_neighbor_idx(neighbor_idx.size(), neighbor_idx.data());
         py::array_t<double> py_distances(distances.size(), distances.data());
@@ -44,8 +44,8 @@ public:
         if (data_ == nullptr) {
             throw std::runtime_error("Data is not assigned");
         }
-        if ((query.ndim() == 1)||(query.shape(0) != dimension_)) {
-            throw std::runtime_error("Query must be a shape of (1, dimension)");
+        if ((query.ndim() != 1)||(query.shape(0) != dimension_)) {
+            throw std::runtime_error("Query must be a shape of ("+ std::to_string(dimension_) +",)");
         }
         std::vector<size_t> neighbor_idx;
         std::vector<double> distances;
@@ -62,8 +62,8 @@ public:
         if (data_ == nullptr) {
             throw std::runtime_error("Data is not assigned");
         }
-        if ((query.ndim() == 1)||(query.shape(0) != dimension_)) {
-            throw std::runtime_error("Query must be a shape of (1, dimension)");
+        if ((query.ndim() != 1)||(query.shape(0) != dimension_)) {
+            throw std::runtime_error("Query must be a shape of ("+ std::to_string(dimension_) +",)");
         }
         std::vector<size_t> neighbor_idx;
         std::vector<double> distances;
