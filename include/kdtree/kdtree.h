@@ -25,7 +25,7 @@ private:
       int dim_;
       T distance_;
       std::vector<T> dist_vector_;
-      NodeInfo(size_t idx, int dim, T distance, std::vector<T> dist_vector) :
+      NodeInfo(size_t idx, int dim, T distance, std::vector<T>& dist_vector) :
           idx_(idx), dim_(dim), distance_(distance), dist_vector_(dist_vector) {}
     };
 
@@ -48,8 +48,6 @@ public:
 
   void assign(const T* data, int dim, size_t num, bool copy = false);
   void assign(const std::vector<T>& data, int dim, bool copy = false);
-  void add(const T* data, size_t num);
-
   bool isCopied();
 
   int searchKNN(const std::vector<T>& query, const int k,
