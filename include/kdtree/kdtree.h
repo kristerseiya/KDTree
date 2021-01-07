@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <vector>
 #include <cstdbool>
+// #include <tuple>
+#include <queue>
 
 template <typename T>
 class KDTree {
@@ -15,6 +17,28 @@ protected:
     const T* data_;
     size_t* implicit_idx_tree_;
     bool copied_;
+
+private:
+    // typedef std::tuple<size_t, int, T, std::vector<T> > NodeInfo;
+    struct NodeInfo {
+      size_t idx_;
+      int dim_;
+      T distance_;
+      std::vector<T> dist_vector_;
+      NodeInfo(size_t idx, int dim, T distance, std::vector<T> dist_vector) :
+          idx_(idx), dim_(dim), distance_(distance), dist_vector_(dist_vector) {}
+    };
+
+    struct CompareNodeInfo {
+      bool operator()(const NodeInfo& lhs, const NodeInfo& rhs) {
+        return lhs.distance_ > rhs.distance_;
+      }
+    };
+    //
+    // auto NodeDistCompare = [](const IdxDistTuple& lhs, const IdxDistTuple& rhs) -> bool
+    //     { return std::get<2>(lhs) > std::get<2>(rhs); }
+
+    std::priority_queue<NodeInfo, std::vector<NodeInfo>, CompareNodeInfo> queue_;
 
 public:
   KDTree();
@@ -40,17 +64,17 @@ public:
                      size_t max_neighbors = 0);
 
 private:
-  void searchKNNWithImplicitTreeOtherBranch(size_t node_idx,
-                                 const std::vector<T>& query,
-                                 const int k, int curr_dim,
-                                 std::vector<size_t>& neighbor_idx,
-                                 std::vector<T>& distances,
-                                 T* dist2bbarr);
+
+  void checkQueue(const std::vector<T>& query, const int k,
+                  std::vector<size_t>& neighbor_idx,
+                  std::vector<T>& distances);
+
   void searchKNNWithImplicitTree(size_t node_idx,
                                  const std::vector<T>& query,
                                  const int k, int curr_dim,
                                  std::vector<size_t>& neighbor_idx,
-                                 std::vector<T>& distances);
+                                 std::vector<T>& distances,
+                                 std::vector<T>& dist2bbarr);
   void searchRadiusWithImplicitTree(size_t node_idx,
                                     const std::vector<T> &query,
                                     const T radius,
