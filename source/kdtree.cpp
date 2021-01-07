@@ -287,14 +287,22 @@ void KDTree<T>::checkQueue(const std::vector<T>& query, const int k,
                            std::vector<size_t>& neighbor_idx,
                            std::vector<T>& distances) {
 
+  if (queue_.empty()) {
+     return;
+  }
+
   NodeInfo idx_dist = queue_.top();
   queue_.pop();
 
-  size_t node_idx = idx_dist.idx_;
-
-  if (node_idx >= n_points_) {
-      return;
+  while (idx_dist.idx_ >= n_points_) {
+      if (queue_.empty()) {
+          return;
+      }
+      idx_dist = queue_.top();
+      queue_.pop();
   }
+
+  size_t node_idx = idx_dist.idx_;
 
   visited_++;
 
@@ -310,15 +318,15 @@ void KDTree<T>::checkQueue(const std::vector<T>& query, const int k,
 
   std::vector<T> dist2bbarr = idx_dist.dist_vector_;
   std::vector<T> dist2bbarr_cpy = dist2bbarr;
-  // dist2bb -= dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
-  // dist2bbarr[curr_dim] = (query[curr_dim] - curr_x[curr_dim]) * (query[curr_dim] - curr_x[curr_dim]);
-  // dist2bbarr[curr_dim] = dist2bb;
-  // dist2bb += dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
+  dist2bb -= dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
   dist2bbarr[curr_dim] = (query[curr_dim] - curr_x[curr_dim]) * (query[curr_dim] - curr_x[curr_dim]);
-  dist2bb = 0;
-  for (auto d : dist2bbarr) {
-      dist2bb += d;
-  }
+  dist2bbarr[curr_dim] = dist2bb;
+  dist2bb += dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
+  // dist2bbarr[curr_dim] = (query[curr_dim] - curr_x[curr_dim]) * (query[curr_dim] - curr_x[curr_dim]);
+  // dist2bb = 0;
+  // for (auto d : dist2bbarr) {
+  //     dist2bb += d;
+  // }
 
   int next_dim = (curr_dim + 1) % dimension_;
 
@@ -330,7 +338,7 @@ void KDTree<T>::checkQueue(const std::vector<T>& query, const int k,
     searchKNNWithImplicitTree(node_idx * 2 + 2, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
   }
 
-  checkQueue(query, k, neighbor_idx, distances);
+  //checkQueue(query, k, neighbor_idx, distances);
 
 }
 
