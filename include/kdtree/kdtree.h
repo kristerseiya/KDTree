@@ -3,25 +3,31 @@
 
 #include <cstdlib>
 #include <vector>
+#include <cstdbool>
 
 template <typename T>
 class KDTree {
 
-public:
-    size_t num_nodes_;
+protected:
+    size_t n_points_;
     int dimension_;
     size_t visited_;
-protected:
     const T* data_;
     size_t* implicit_idx_tree_;
+    bool copied_;
 
 public:
   KDTree();
-  KDTree(const T* data, int dim, size_t num);
-  KDTree(const std::vector<T>& data, int dim);
+  KDTree(const T* data, int dim, size_t num, bool copy = false);
+  KDTree(const std::vector<T>& data, int dim, bool copy = false);
   ~KDTree();
 
-  void set(const T* data, int dim, size_t num);
+  void assign(const T* data, int dim, size_t num, bool copy = false);
+  void assign(const std::vector<T>& data, int dim, bool copy = false);
+  void add(const T* data, size_t num);
+
+  bool isCopied();
+
   int searchKNN(const std::vector<T>& query, const int k,
                 std::vector<size_t>& neighbor_idx,
                 std::vector<T>& distances);
@@ -34,6 +40,12 @@ public:
                      size_t max_neighbors = 0);
 
 private:
+  void searchKNNWithImplicitTreeOtherBranch(size_t node_idx,
+                                 const std::vector<T>& query,
+                                 const int k, int curr_dim,
+                                 std::vector<size_t>& neighbor_idx,
+                                 std::vector<T>& distances,
+                                 T* dist2bbarr);
   void searchKNNWithImplicitTree(size_t node_idx,
                                  const std::vector<T>& query,
                                  const int k, int curr_dim,
@@ -53,4 +65,3 @@ private:
                                     std::vector<T> &distances,
                                     const size_t max_neighbors);
 };
-

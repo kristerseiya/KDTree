@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   std::cout << points.size() << std::endl;
 
   auto point_arr = Eigen::Map<const Eigen::MatrixXd>((const double*)points.data(), 1, points.size() * 3);
-  KDTree<double> kdt(point_arr.data(),3,points.size());
+  KDTree<double> kdt(point_arr.data(),3,points.size(), false);
 
   std::vector<double> query(3);
   query[0] = points[0][0]; query[1] = points[0][1]; query[2] = points[0][2];
