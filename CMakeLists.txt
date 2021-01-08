@@ -24,10 +24,10 @@ endif()
 ############################
 
 
-file(GLOB KDTREE_SOURCES source/kdtree.cpp)
+file(GLOB KDTREE_SOURCES source/constructor.cpp source/kdtree.cpp)
 add_library(kdtree STATIC ${KDTREE_SOURCES})
 # set_target_properties(kdtree PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_include_directories(kdtree PRIVATE include)
+target_include_directories(kdtree PRIVATE include source)
 
 if (BUILD_KDTREE_TEST)
     add_subdirectory(test)

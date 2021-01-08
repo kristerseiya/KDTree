@@ -79,12 +79,15 @@ private:
                                  std::vector<size_t>& neighbor_idx,
                                  std::vector<T>& distances,
                                  std::vector<T>& dist2bbarr);
+
   void searchRadiusWithImplicitTree(size_t node_idx,
-                                    const std::vector<T> &query,
+                                    const std::vector<T>& query,
                                     const T radius,
                                     int curr_dim,
-                                    std::vector<size_t> &neighbor_idx,
-                                    std::vector<T> &distances);
+                                    std::vector<size_t>& neighbor_idx,
+                                    std::vector<T>& distances,
+                                    std::vector<T>& dist2bbarr);
+
   void searchHybridWithImplicitTree(size_t node_idx,
                                     const std::vector<T> &query,
                                     const T radius,

@@ -61,12 +61,25 @@ public:
         if ((query.ndim() != 1)||(query.shape(0) != dimension_)) {
             throw std::runtime_error("Query must be a shape of ("+ std::to_string(dimension_) +",)");
         }
-        std::vector<size_t> neighbor_idx;
-        std::vector<double> distances;
+        auto neighbor_idx = new std::vector<size_t>();
+        auto distances = new std::vector<double>();
         this->searchRadius(std::vector<double>(query.data(),query.data()+query.shape(0)),
-                            radius, neighbor_idx, distances);
-        py::array_t<size_t> py_neighbor_idx(neighbor_idx.size(), neighbor_idx.data());
-        py::array_t<double> py_distances(distances.size(), distances.data());
+                            radius, *neighbor_idx, *distances);
+        // py::array_t<size_t> py_neighbor_idx(neighbor_idx.size(), neighbor_idx.data());
+        // py::array_t<double> py_distances(distances.size(), distances.data());
+        // return std::make_tuple(py_neighbor_idx, py_distances);
+        auto capsule1 = py::capsule(neighbor_idx, [](void* neighbor_idx) {
+            delete reinterpret_cast<std::vector<size_t>*>(neighbor_idx); });
+        auto capsule2 = py::capsule(distances, [](void* distances) {
+            delete reinterpret_cast<std::vector<double>*>(distances); });
+
+        py::array_t<size_t> py_neighbor_idx(neighbor_idx->size(),
+                                            neighbor_idx->data(),
+                                            capsule1);
+
+        py::array_t<double> py_distances(distances->size(),
+                                         distances->data(),
+                                         capsule2);
         return std::make_tuple(py_neighbor_idx, py_distances);
     }
 
