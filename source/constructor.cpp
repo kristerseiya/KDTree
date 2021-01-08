@@ -45,18 +45,18 @@ static int calcLeftRightBottomNodeDifferenceLeafOne(size_t num_nodes) {
 }
 
 static size_t computeLeafNodeStartIndex(size_t num_nodes, size_t leaf_size) {
-    if (leaf_size == 1) {
-      num_nodes = num_nodes + 1;
-    }
+    // if (leaf_size == 1) {
+    //   num_nodes = num_nodes + 1;
+    // }
     size_t num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
     return num_leaf_nodes - 1;
 }
 
 static int calcLeftRightBottomNodeDifference(size_t num_nodes, size_t leaf_size) {
 
-  if (leaf_size == 1) {
-    return calcLeftRightBottomNodeDifferenceLeafOne(num_nodes);
-  }
+  // if (leaf_size == 1) {
+  //   return calcLeftRightBottomNodeDifferenceLeafOne(num_nodes);
+  // }
 
   int num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
   int num_bottom_nodes = 2 * num_leaf_nodes - 1;
@@ -107,9 +107,9 @@ static int calcSplitLeafOne(size_t num_nodes) {
 
 static size_t calcSplit(size_t num_nodes, size_t leaf_size) {
 
-  if (leaf_size == 1) {
-      return calcSplitLeafOne(num_nodes);
-  }
+  // if (leaf_size == 1) {
+  //     return calcSplitLeafOne(num_nodes);
+  // }
 
   size_t num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
   size_t num_bottom_nodes = 2 * num_leaf_nodes - 1;
@@ -136,7 +136,7 @@ static size_t calcSplit(size_t num_nodes, size_t leaf_size) {
               + (max_nodes_in_curr_level / 2 - right_num_bottom_nodes) / 2 * (leaf_size - 1);
   size_t extra = num_nodes - (num_leaf_nodes - 1) - num_leaf_nodes * leaf_size;
 
-  return (right_num_bottom_nodes == 0) ?
+  return ((right_num_bottom_nodes == 0)&&(left_num_bottom_nodes!=0)) ?
   left_extra + extra + (max_nodes_in_curr_level - 2) / 2 : left_extra + (max_nodes_in_curr_level - 2) / 2;
 }
 
