@@ -25,15 +25,15 @@ static bool canBuildCompleteBinaryTree(size_t num_nodes) {
   return true;
 }
 
-static size_t calcLeftRightBottomNodeDifferenceLeafOne(size_t num_nodes) {
-  size_t num_bottom_nodes = num_nodes;
-  size_t max_nodes_in_curr_level = 1;
+static int calcLeftRightBottomNodeDifferenceLeafOne(size_t num_nodes) {
+  int num_bottom_nodes = num_nodes;
+  int max_nodes_in_curr_level = 1;
   while (num_bottom_nodes >= max_nodes_in_curr_level) {
     num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
     max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
   }
-  size_t left_num_bottom_nodes = 0;
-  size_t right_num_bottom_nodes = 0;
+  int left_num_bottom_nodes = 0;
+  int right_num_bottom_nodes = 0;
   if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
     left_num_bottom_nodes = max_nodes_in_curr_level / 2;
     right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
@@ -45,17 +45,70 @@ static size_t calcLeftRightBottomNodeDifferenceLeafOne(size_t num_nodes) {
 }
 
 static size_t computeLeafNodeStartIndex(size_t num_nodes, size_t leaf_size) {
-    // if (leaf_size == 1) {
-    //   return num_nodes;
-    // }
-    size_t num_leaf_nodes = (num_nodes + 2) / (1 + leaf_size);
+    if (leaf_size == 1) {
+      num_nodes = num_nodes + 1;
+    }
+    size_t num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
     return num_leaf_nodes - 1;
 }
 
-static size_t calcLeftRightBottomNodeDifference(size_t num_nodes, size_t leaf_size) {
+static int calcLeftRightBottomNodeDifference(size_t num_nodes, size_t leaf_size) {
 
   if (leaf_size == 1) {
     return calcLeftRightBottomNodeDifferenceLeafOne(num_nodes);
+  }
+
+  int num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
+  int num_bottom_nodes = 2 * num_leaf_nodes - 1;
+  int max_nodes_in_curr_level = 1;
+
+  while (num_bottom_nodes >= max_nodes_in_curr_level) {
+    num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
+    max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
+  }
+
+  int left_num_bottom_nodes = 0;
+  int right_num_bottom_nodes = 0;
+  if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
+    left_num_bottom_nodes = max_nodes_in_curr_level / 2;
+    right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
+  } else {
+    left_num_bottom_nodes = num_bottom_nodes;
+    right_num_bottom_nodes = 0;
+  }
+
+  int left_extra = left_num_bottom_nodes * leaf_size
+              + (max_nodes_in_curr_level / 2 - left_num_bottom_nodes) / 2 * (leaf_size - 1);
+  int right_extra = right_num_bottom_nodes * leaf_size
+              + (max_nodes_in_curr_level / 2 - right_num_bottom_nodes) / 2 * (leaf_size - 1);
+  int extra = num_nodes - (num_leaf_nodes - 1) - num_leaf_nodes * leaf_size;
+
+  return (right_num_bottom_nodes == 0) ? left_extra - right_extra + extra : left_extra - right_extra - extra;
+}
+
+static int calcSplitLeafOne(size_t num_nodes) {
+  int num_bottom_nodes = num_nodes;
+  int max_nodes_in_curr_level = 1;
+  while (num_bottom_nodes >= max_nodes_in_curr_level) {
+    num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
+    max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
+  }
+  int left_num_bottom_nodes = 0;
+  int right_num_bottom_nodes = 0;
+  if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
+    left_num_bottom_nodes = max_nodes_in_curr_level / 2;
+    right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
+  } else {
+    left_num_bottom_nodes = num_bottom_nodes;
+    right_num_bottom_nodes = 0;
+  }
+  return left_num_bottom_nodes + (max_nodes_in_curr_level - 2) / 2;
+}
+
+static size_t calcSplit(size_t num_nodes, size_t leaf_size) {
+
+  if (leaf_size == 1) {
+      return calcSplitLeafOne(num_nodes);
   }
 
   size_t num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
@@ -83,7 +136,8 @@ static size_t calcLeftRightBottomNodeDifference(size_t num_nodes, size_t leaf_si
               + (max_nodes_in_curr_level / 2 - right_num_bottom_nodes) / 2 * (leaf_size - 1);
   size_t extra = num_nodes - (num_leaf_nodes - 1) - num_leaf_nodes * leaf_size;
 
-  return (right_num_bottom_nodes == 0) ? left_extra - right_extra + extra : left_extra - right_extra - extra;
+  return (right_num_bottom_nodes == 0) ?
+  left_extra + extra + (max_nodes_in_curr_level - 2) / 2 : left_extra + (max_nodes_in_curr_level - 2) / 2;
 }
 
 // a helper function that qsorts an array until
@@ -137,7 +191,12 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
 
   if (idx >= leaf_node_starts) {
     assert(size >= leaf_size);
-    assert(size < 2 * leaf_size);
+    // if (size >= 2 * leaf_size) {
+    //   printf("%lu\n", size);
+    //   printf("%lu\n", idx);
+    //   printf("%lu\n", leaf_node_starts);
+    // }
+    assert(size <= 2 * leaf_size);
     idx = leaf_node_starts + (idx - leaf_node_starts) * leaf_size;
     for (int i = 0; i < size; i++) {
       idxarr2[idx+i] = idxarr1[start+i];
@@ -154,8 +213,13 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
 //     mid++;
 //   }
 
-  size_t diff = calcLeftRightBottomNodeDifference(size, leaf_size);
-  size_t mid = start + (size + diff) / 2;
+  size_t mid = start + calcSplit(size, leaf_size);
+  // int diff = calcLeftRightBottomNodeDifference(size, leaf_size);
+  // size_t mid = start + (size + diff) / 2;
+  // size_t mid = start;
+  // while ((mid - start) - (end - mid) != diff) {
+  //   mid++;
+  // }
 
   qsortForThisIndex<T>(data, idxarr1+start, dim, end-start+1, curr_dim, mid-start);
 
