@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <vector>
 #include <cstdbool>
-// #include <tuple>
 #include <queue>
 
 template <typename T>
@@ -17,25 +16,21 @@ protected:
     const T* data_;
     size_t* implicit_idx_tree_;
     bool copied_;
+    size_t leaf_size_;
+    size_t leaf_starts_at_;
 
 private:
 
-    // struct NodeInfo {
-    //   size_t idx_;
-    //   int dim_;
-    //   T distance_;
-    //   std::vector<T> dist_vector_;
-    //   NodeInfo(size_t idx, int dim, T distance, std::vector<T>& dist_vector) :
-    //       idx_(idx), dim_(dim), distance_(distance), dist_vector_(dist_vector) {}
-    // };
     struct NodeInfo {
       size_t idx_;
       size_t next_idx_;
       int next_dim_;
       T distance_;
       std::vector<T> dist_vector_;
-      NodeInfo(size_t idx, size_t next_idx, int next_dim, T distance, std::vector<T>& dist_vector) :
-          idx_(idx), next_idx_(next_idx), next_dim_(next_dim), distance_(distance), dist_vector_(dist_vector) {}
+      NodeInfo(size_t idx, size_t next_idx, int next_dim,
+               T distance, std::vector<T>& dist_vector) :
+          idx_(idx), next_idx_(next_idx), next_dim_(next_dim),
+          distance_(distance), dist_vector_(dist_vector) {}
     };
 
     struct CompareNodeInfo {
@@ -48,12 +43,12 @@ private:
 
 public:
   KDTree();
-  KDTree(const T* data, int dim, size_t num, bool copy = false);
-  KDTree(const std::vector<T>& data, int dim, bool copy = false);
+  KDTree(const T* data, int dim, size_t num, int leaf_size = 1, bool copy = false);
+  KDTree(const std::vector<T>& data, int dim, int leaf_size = 1, bool copy = false);
   ~KDTree();
 
-  void assign(const T* data, int dim, size_t num, bool copy = false);
-  void assign(const std::vector<T>& data, int dim, bool copy = false);
+  void assign(const T* data, int dim, size_t num, int leaf_size = 1, bool copy = false);
+  void assign(const std::vector<T>& data, int dim, int leaf_size = 1, bool copy = false);
   bool isCopied();
 
   int searchKNN(const std::vector<T>& query, const int k,
@@ -68,6 +63,11 @@ public:
                      size_t max_neighbors = 0);
 
 private:
+
+  void updateKNN(const std::vector<T>& query,
+                 const T* x, size_t x_idx,
+                 std::vector<size_t>& neighbor_idx,
+                 std::vector<T>& distances, int k);
 
   void checkQueue(const std::vector<T>& query, const int k,
                   std::vector<size_t>& neighbor_idx,

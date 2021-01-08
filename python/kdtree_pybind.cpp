@@ -9,11 +9,11 @@ class PyKDTree : private KDTree<double> {
 public:
     PyKDTree() : KDTree<double>() {}
 
-    void assign_numpy(py::array_t<double, py::array::c_style | py::array::forcecast> data) {
+    void assign_numpy(py::array_t<double, py::array::c_style | py::array::forcecast> data, int leaf_size) {
         if (data.ndim() != 2) {
             throw std::runtime_error("Input must be 2 dimensional");
         }
-        this->assign((double*)data.data(),data.shape(1),data.shape(0));
+        this->assign((double*)data.data(), data.shape(1), data.shape(0), leaf_size);
     }
 
     std::tuple< py::array_t<size_t>,py::array_t<double> >
@@ -104,6 +104,10 @@ public:
     int get_n_calls() {
         return visited_;
     }
+
+    int get_leaf_size() {
+       return leaf_size_;
+    }
 };
 
 PYBIND11_MODULE(pykdtree, m) {
@@ -113,5 +117,6 @@ PYBIND11_MODULE(pykdtree, m) {
             .def("searchKNN", &PyKDTree::search_knn)
             .def("searchRadius", &PyKDTree::search_radius)
             .def("searchHybrid", &PyKDTree::search_hybrid)
-            .def("get_n_calls", &PyKDTree::get_n_calls);
+            .def("get_n_calls", &PyKDTree::get_n_calls)
+            .def("get_leaf_size", &PyKDTree::get_leaf_size);
 }

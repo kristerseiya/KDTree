@@ -64,10 +64,11 @@ static void swapWithMax(std::vector<size_t>& idx_arr,
 }
 
 template <typename T>
-static void updateKNN(const std::vector<T>& query,
+void KDTree<T>::updateKNN(const std::vector<T>& query,
                       const T* x, size_t x_idx,
                       std::vector<size_t>& neighbor_idx,
                       std::vector<T>& distances, int k) {
+    visited_++;
     // compute L2-distance^2 from the current vector to the query
     T distance = 0;
     for (int i = 0; i < query.size(); i++) {
@@ -117,8 +118,8 @@ void KDTree<T>::checkQueue(const std::vector<T>& query, const int k,
 
   size_t node_idx = next_node.idx_;
   const T* curr_x = data_ + implicit_idx_tree_[node_idx] * dimension_;
-  visited_++;
-  updateKNN<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
+  //visited_++;
+  updateKNN(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
 
   searchKNNWithImplicitTree(next_node.next_idx_, query, k, next_node.next_dim_,
                             neighbor_idx, distances, next_node.dist_vector_);
@@ -136,6 +137,18 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
 
     // index out of range of the implicit tree
     if (node_idx >= n_points_) {
+        return;
+    }
+
+    if (node_idx >= leaf_starts_at_) {
+        node_idx = leaf_starts_at_ + (node_idx - leaf_starts_at_) * leaf_size_;
+        int leaf_size = leaf_size_;
+        if (node_idx + leaf_size * 2 >= n_points_) {
+            leaf_size = n_points_ - node_idx + 1;
+        }
+        for (int i = 0; i < leaf_size; i++) {
+          updateKNN(query, data_ + implicit_idx_tree_[node_idx + i] * dimension_, implicit_idx_tree_[node_idx + i], neighbor_idx, distances, k);
+        }
         return;
     }
 
