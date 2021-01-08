@@ -183,9 +183,9 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
                                       size_t start, size_t end, int dim, int curr_dim,
                                       size_t idx, const size_t leaf_size, const size_t leaf_node_starts) {
 
-  if (start > end) {
-    return;
-  }
+  // if (start > end) {
+  //   return;
+  // }
 
   size_t size = end - start + 1;
 

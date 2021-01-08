@@ -138,9 +138,9 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
     // index out of range of the implicit tree
     // this can happen if leaf size is 1
     // and there is node that has left child but no right child
-    if (node_idx >= n_points_) {
-        return;
-    }
+    // if (node_idx >= n_points_) {
+    //     return;
+    // }
 
     if (node_idx >= leaf_starts_at_) {
         node_idx = leaf_starts_at_ + (node_idx - leaf_starts_at_) * leaf_size_;
