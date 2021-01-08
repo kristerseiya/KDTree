@@ -7,13 +7,29 @@ namespace py = pybind11;
 
 class PyKDTree : private KDTree<double> {
 public:
-    PyKDTree() : KDTree<double>() {}
+    //PyKDTree() : KDTree<double>() {}
 
     void assign_numpy(py::array_t<double, py::array::c_style | py::array::forcecast> data, int leaf_size) {
         if (data.ndim() != 2) {
             throw std::runtime_error("Input must be 2 dimensional");
         }
         this->assign((double*)data.data(), data.shape(1), data.shape(0), leaf_size);
+    }
+
+    PyKDTree(py::array_t<double, py::array::c_style | py::array::forcecast> data = py::array_t<double>(), int leaf_size = 1) {
+        if (data.size() == 0) {
+            KDTree<double>();
+            // data_ = nullptr;
+            // n_points_ = 0;
+            // implicit_idx_tree_ = nullptr;
+            // visited_ = 0;
+            // dimension_ = 0;
+            // copied_ = false;
+            // leaf_size_ = 1;
+            // leaf_starts_at_ = 0;
+        } else {
+          this->assign_numpy(data, leaf_size);
+        }
     }
 
     std::tuple< py::array_t<size_t>,py::array_t<double> >
@@ -113,7 +129,9 @@ public:
 PYBIND11_MODULE(pykdtree, m) {
     py::class_<PyKDTree> (m, "KDTree")
             .def(py::init<>())
-            .def("assign", &PyKDTree::assign_numpy)
+            .def(py::init<py::array_t<double> >())
+            .def(py::init<py::array_t<double>, int>())
+            .def("assign", &PyKDTree::assign_numpy, py::arg("data"), py::arg("leaf_size")=1)
             .def("searchKNN", &PyKDTree::search_knn)
             .def("searchRadius", &PyKDTree::search_radius)
             .def("searchHybrid", &PyKDTree::search_hybrid)
