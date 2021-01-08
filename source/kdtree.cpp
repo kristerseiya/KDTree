@@ -116,6 +116,7 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
   //   left_num_bottom_nodes = num_bottom_nodes;
   //   right_num_bottom_nodes = 0;
   // }
+
   size_t diff = calcLeftRightBottomNodeDifference(size);
   size_t mid = start + (size + diff) / 2;
 
@@ -302,43 +303,39 @@ void KDTree<T>::checkQueue(const std::vector<T>& query, const int k,
       queue_.pop();
   }
 
-  size_t node_idx = idx_dist.idx_;
-
-  visited_++;
-
-  int curr_dim = idx_dist.dim_;
   T dist2bb = idx_dist.distance_;
 
   if ((neighbor_idx.size() >= k)&&(distances.back() < dist2bb)) {
     return;
   }
 
+  visited_++;
+
+  size_t node_idx = idx_dist.idx_;
   const T* curr_x = data_ + implicit_idx_tree_[node_idx] * dimension_;
   updateKNN<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
 
+  int next_dim = idx_dist.next_dim_;
+
   std::vector<T> dist2bbarr = idx_dist.dist_vector_;
-  std::vector<T> dist2bbarr_cpy = dist2bbarr;
-  dist2bb -= dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
-  dist2bbarr[curr_dim] = (query[curr_dim] - curr_x[curr_dim]) * (query[curr_dim] - curr_x[curr_dim]);
-  dist2bbarr[curr_dim] = dist2bb;
-  dist2bb += dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
+  // std::vector<T> dist2bbarr_cpy = dist2bbarr;
+  // dist2bb -= dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
   // dist2bbarr[curr_dim] = (query[curr_dim] - curr_x[curr_dim]) * (query[curr_dim] - curr_x[curr_dim]);
-  // dist2bb = 0;
-  // for (auto d : dist2bbarr) {
-  //     dist2bb += d;
+  // dist2bbarr[curr_dim] = dist2bb;
+  // dist2bb += dist2bbarr[curr_dim] * dist2bbarr[curr_dim];
+
+  size_t next_node_idx = idx_dist.next_idx_;
+
+  searchKNNWithImplicitTree(next_node_idx, query, k, next_dim, neighbor_idx, distances, dist2bbarr);
+  // int next_dim = (curr_dim + 1) % dimension_;
+
+  // if (query[curr_dim] <= curr_x[curr_dim]) {
+  //   queue_.emplace(node_idx * 2 + 2, next_dim, dist2bb, dist2bbarr);
+  //   searchKNNWithImplicitTree(node_idx * 2 + 1, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
+  // } else {
+  //   queue_.emplace(node_idx * 2 + 1, next_dim, dist2bb, dist2bbarr);
+  //   searchKNNWithImplicitTree(node_idx * 2 + 2, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
   // }
-
-  int next_dim = (curr_dim + 1) % dimension_;
-
-  if (query[curr_dim] <= curr_x[curr_dim]) {
-    queue_.emplace(node_idx * 2 + 2, next_dim, dist2bb, dist2bbarr);
-    searchKNNWithImplicitTree(node_idx * 2 + 1, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
-  } else {
-    queue_.emplace(node_idx * 2 + 1, next_dim, dist2bb, dist2bbarr);
-    searchKNNWithImplicitTree(node_idx * 2 + 2, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
-  }
-
-  //checkQueue(query, k, neighbor_idx, distances);
 
 }
 
@@ -357,7 +354,7 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
     }
 
     // update number of nodes visited
-    visited_++;
+    //visited_++;
 
     // get current vector of interest
     const T* curr_x = data_ + implicit_idx_tree_[node_idx] * dimension_;
@@ -373,14 +370,14 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
     int next_dim = (curr_dim + 1) % dimension_;
 
     if (query[curr_dim] <= curr_x[curr_dim]) {
-      queue_.emplace(node_idx * 2 + 2, next_dim, dist2bb, dist2bbarr);
+      queue_.emplace(node_idx, node_idx * 2 + 2, next_dim, dist2bb, dist2bbarr);
       searchKNNWithImplicitTree(node_idx * 2 + 1, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
     } else {
-      queue_.emplace(node_idx * 2 + 1, next_dim, dist2bb, dist2bbarr);
+      queue_.emplace(node_idx, node_idx * 2 + 1, next_dim, dist2bb, dist2bbarr);
       searchKNNWithImplicitTree(node_idx * 2 + 2, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
     }
 
-    updateKNN<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
+    //updateKNN<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
     checkQueue(query, k, neighbor_idx, distances);
 }
 

@@ -19,14 +19,23 @@ protected:
     bool copied_;
 
 private:
-    // typedef std::tuple<size_t, int, T, std::vector<T> > NodeInfo;
+
+    // struct NodeInfo {
+    //   size_t idx_;
+    //   int dim_;
+    //   T distance_;
+    //   std::vector<T> dist_vector_;
+    //   NodeInfo(size_t idx, int dim, T distance, std::vector<T>& dist_vector) :
+    //       idx_(idx), dim_(dim), distance_(distance), dist_vector_(dist_vector) {}
+    // };
     struct NodeInfo {
       size_t idx_;
-      int dim_;
+      size_t next_idx_;
+      int next_dim_;
       T distance_;
       std::vector<T> dist_vector_;
-      NodeInfo(size_t idx, int dim, T distance, std::vector<T>& dist_vector) :
-          idx_(idx), dim_(dim), distance_(distance), dist_vector_(dist_vector) {}
+      NodeInfo(size_t idx, size_t next_idx, int next_dim, T distance, std::vector<T>& dist_vector) :
+          idx_(idx), next_idx_(next_idx), next_dim_(next_dim), distance_(distance), dist_vector_(dist_vector) {}
     };
 
     struct CompareNodeInfo {
@@ -34,9 +43,6 @@ private:
         return lhs.distance_ > rhs.distance_;
       }
     };
-    //
-    // auto NodeDistCompare = [](const IdxDistTuple& lhs, const IdxDistTuple& rhs) -> bool
-    //     { return std::get<2>(lhs) > std::get<2>(rhs); }
 
     std::priority_queue<NodeInfo, std::vector<NodeInfo>, CompareNodeInfo> queue_;
 
