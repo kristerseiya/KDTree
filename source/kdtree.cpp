@@ -136,6 +136,8 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
                                           std::vector<T>& dist2bbarr) {
 
     // index out of range of the implicit tree
+    // this can happen if leaf size is 1
+    // and there is node that has left child but no right child
     if (node_idx >= n_points_) {
         return;
     }
@@ -199,10 +201,11 @@ int KDTree<T>::searchKNN(const std::vector<T>& query, const int k,
 }
 
 template <typename T>
-static void updateRadius(const std::vector<T>& query,
+void KDTree<T>::updateRadius(const std::vector<T>& query,
                          const T* x, size_t x_idx,
                          std::vector<size_t>& neighbor_idx,
-                         std::vector<T>& distances, double radius) {
+                         std::vector<T>& distances, const T radius) {
+    visited_++;
     // compute L2-distance^2 from the current vector to the query
     T distance = 0;
     for (int i = 0; i < query.size(); i++) {
@@ -233,6 +236,18 @@ void KDTree<T>::searchRadiusWithImplicitTree(size_t node_idx,
         return;
     }
 
+    if (node_idx >= leaf_starts_at_) {
+        node_idx = leaf_starts_at_ + (node_idx - leaf_starts_at_) * leaf_size_;
+        int leaf_size = leaf_size_;
+        if (node_idx + leaf_size * 2 >= n_points_) {
+            leaf_size = n_points_ - node_idx + 1;
+        }
+        for (int i = 0; i < leaf_size; i++) {
+          updateRadius(query, data_ + implicit_idx_tree_[node_idx + i] * dimension_, implicit_idx_tree_[node_idx + i], neighbor_idx, distances, radius);
+        }
+        return;
+    }
+
     // get current vector of interest
     const T* curr_x = data_ + implicit_idx_tree_[node_idx] * dimension_;
 
@@ -251,8 +266,7 @@ void KDTree<T>::searchRadiusWithImplicitTree(size_t node_idx,
         searchRadiusWithImplicitTree(node_idx*2+1, query, radius, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
         // compute L2-distance^2 from the boundary to the query
         if (dist2bb <= radius) {
-            visited_++;
-            updateRadius<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, radius);
+            updateRadius(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, radius);
             searchRadiusWithImplicitTree(node_idx*2+2, query, radius, next_dim, neighbor_idx, distances, dist2bbarr);
         }
     } else {
@@ -260,8 +274,7 @@ void KDTree<T>::searchRadiusWithImplicitTree(size_t node_idx,
         searchRadiusWithImplicitTree(node_idx*2+2, query, radius, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
         // compute L2-distance^2 from the boundary to the query
         if (dist2bb <= radius) {
-            visited_++;
-            updateRadius<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, radius);
+            updateRadius(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, radius);
             searchRadiusWithImplicitTree(node_idx*2+1, query, radius, next_dim, neighbor_idx, distances, dist2bbarr);
         }
     }

@@ -7,32 +7,35 @@ namespace py = pybind11;
 
 class PyKDTree : private KDTree<double> {
 public:
-    //PyKDTree() : KDTree<double>() {}
+    PyKDTree() : KDTree<double>() {}
 
-    void assign_numpy(py::array_t<double, py::array::c_style | py::array::forcecast> data, int leaf_size) {
+    void assign_numpy(py::array_t<double, py::array::c_style | py::array::forcecast> data,
+                      int leaf_size, bool copy = false) {
         if (data.ndim() != 2) {
             throw std::runtime_error("Input must be 2 dimensional");
         }
-        this->assign((double*)data.data(), data.shape(1), data.shape(0), leaf_size);
+        this->assign((double*)data.data(), data.shape(1), data.shape(0), leaf_size, copy);
     }
 
-    PyKDTree(py::array_t<double, py::array::c_style | py::array::forcecast> data = py::array_t<double>(), int leaf_size = 1) {
-        if (data.size() == 0) {
-            KDTree<double>();
-            // data_ = nullptr;
-            // n_points_ = 0;
-            // implicit_idx_tree_ = nullptr;
-            // visited_ = 0;
-            // dimension_ = 0;
-            // copied_ = false;
-            // leaf_size_ = 1;
-            // leaf_starts_at_ = 0;
-        } else {
-          this->assign_numpy(data, leaf_size);
-        }
+    PyKDTree(py::array_t<double, py::array::c_style | py::array::forcecast> data, // = py::array_t<double>(),
+             int leaf_size = 1, bool copy = false) {
+        // if (data.size() == 0) {
+        //     KDTree<double>();
+        // } else {
+          this->assign_numpy(data, leaf_size, copy);
+        // }
     }
 
-    std::tuple< py::array_t<size_t>,py::array_t<double> >
+    py::array_t<const double, py::array::c_style >
+    data() {
+      return py::array_t<const double, py::array::c_style> (std::vector<size_t>{ n_points_, (size_t)dimension_ }, data_ );//capsule);
+    }
+
+    bool is_copied() {
+      return copied_;
+    }
+
+    std::tuple< py::array_t<size_t>,py::array_t<double>  >
     search_knn(py::array_t<double, py::array::c_style | py::array::forcecast> query,
                    int k) {
         if (data_ == nullptr) {
@@ -129,9 +132,11 @@ public:
 PYBIND11_MODULE(pykdtree, m) {
     py::class_<PyKDTree> (m, "KDTree")
             .def(py::init<>())
-            .def(py::init<py::array_t<double> >())
-            .def(py::init<py::array_t<double>, int>())
-            .def("assign", &PyKDTree::assign_numpy, py::arg("data"), py::arg("leaf_size")=1)
+            .def(py::init<py::array_t<double>, int, bool>(),
+            py::arg("data")=py::array_t<double>(), py::arg("leaf_size")=1, py::arg("copy")=false)
+            .def("assign", &PyKDTree::assign_numpy, py::arg("data"), py::arg("leaf_size")=1, py::arg("copy")=false)
+            .def("data", &PyKDTree::data)
+            .def("is_copied", &PyKDTree::is_copied)
             .def("searchKNN", &PyKDTree::search_knn)
             .def("searchRadius", &PyKDTree::search_radius)
             .def("searchHybrid", &PyKDTree::search_hybrid)

@@ -54,9 +54,11 @@ public:
   int searchKNN(const std::vector<T>& query, const int k,
                 std::vector<size_t>& neighbor_idx,
                 std::vector<T>& distances);
+
   int searchRadius(const std::vector<T>& query, const T radius,
                    std::vector<size_t>& neighbor_idx,
                    std::vector<T>& distances);
+
   int searchHybrid(const std::vector<T>& query, const T radius,
                      std::vector<size_t>& neighbor_idx,
                      std::vector<T>& distances,
@@ -79,6 +81,11 @@ private:
                                  std::vector<size_t>& neighbor_idx,
                                  std::vector<T>& distances,
                                  std::vector<T>& dist2bbarr);
+
+  void updateRadius(const std::vector<T>& query,
+                    const T* x, size_t x_idx,
+                    std::vector<size_t>& neighbor_idx,
+                    std::vector<T>& distances, const T radius);
 
   void searchRadiusWithImplicitTree(size_t node_idx,
                                     const std::vector<T>& query,
