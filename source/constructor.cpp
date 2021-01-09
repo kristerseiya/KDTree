@@ -52,40 +52,6 @@ static size_t computeLeafNodeStartIndex(size_t num_nodes, size_t leaf_size) {
     return num_leaf_nodes - 1;
 }
 
-static int calcLeftRightBottomNodeDifference(size_t num_nodes, size_t leaf_size) {
-
-  // if (leaf_size == 1) {
-  //   return calcLeftRightBottomNodeDifferenceLeafOne(num_nodes);
-  // }
-
-  int num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
-  int num_bottom_nodes = 2 * num_leaf_nodes - 1;
-  int max_nodes_in_curr_level = 1;
-
-  while (num_bottom_nodes >= max_nodes_in_curr_level) {
-    num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
-    max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
-  }
-
-  int left_num_bottom_nodes = 0;
-  int right_num_bottom_nodes = 0;
-  if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
-    left_num_bottom_nodes = max_nodes_in_curr_level / 2;
-    right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
-  } else {
-    left_num_bottom_nodes = num_bottom_nodes;
-    right_num_bottom_nodes = 0;
-  }
-
-  int left_extra = left_num_bottom_nodes * leaf_size
-              + (max_nodes_in_curr_level / 2 - left_num_bottom_nodes) / 2 * (leaf_size - 1);
-  int right_extra = right_num_bottom_nodes * leaf_size
-              + (max_nodes_in_curr_level / 2 - right_num_bottom_nodes) / 2 * (leaf_size - 1);
-  int extra = num_nodes - (num_leaf_nodes - 1) - num_leaf_nodes * leaf_size;
-
-  return (right_num_bottom_nodes == 0) ? left_extra - right_extra + extra : left_extra - right_extra - extra;
-}
-
 static int calcSplitLeafOne(size_t num_nodes) {
   int num_bottom_nodes = num_nodes;
   int max_nodes_in_curr_level = 1;
@@ -191,11 +157,6 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
 
   if (idx >= leaf_node_starts) {
     assert(size >= leaf_size);
-    // if (size >= 2 * leaf_size) {
-    //   printf("%lu\n", size);
-    //   printf("%lu\n", idx);
-    //   printf("%lu\n", leaf_node_starts);
-    // }
     assert(size <= 2 * leaf_size);
     idx = leaf_node_starts + (idx - leaf_node_starts) * leaf_size;
     for (int i = 0; i < size; i++) {
@@ -203,23 +164,8 @@ static void buildImplicitKDTreeHelper(const T* data, size_t* idxarr1, size_t* id
     }
     return;
   }
-  // if (start == end) {
-  //   idxarr2[idx] = idxarr1[end];
-  //   return;
-  // }
-
-//   size_t mid = start + (end - start + 1) / 2;
-//   while (!canBuildCompleteBinaryTree(mid-start)&&!canBuildCompleteBinaryTree(end-mid)) {
-//     mid++;
-//   }
 
   size_t mid = start + calcSplit(size, leaf_size);
-  // int diff = calcLeftRightBottomNodeDifference(size, leaf_size);
-  // size_t mid = start + (size + diff) / 2;
-  // size_t mid = start;
-  // while ((mid - start) - (end - mid) != diff) {
-  //   mid++;
-  // }
 
   qsortForThisIndex<T>(data, idxarr1+start, dim, end-start+1, curr_dim, mid-start);
 
@@ -299,7 +245,7 @@ void KDTree<T>::assign(const T* data, int dim, size_t num, int leaf_size /* = 1 
   if (implicit_idx_tree_) { free(implicit_idx_tree_); }
   implicit_idx_tree_ = buildImplicitKDTree<T>(data, dim, num, leaf_size_, leaf_starts_at_);
 
-  printf("kd tree successfully built.\n");
+  //printf("kd tree successfully built.\n");
 }
 
 template <typename T>

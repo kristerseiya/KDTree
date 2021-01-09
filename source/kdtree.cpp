@@ -175,7 +175,6 @@ void KDTree<T>::searchKNNWithImplicitTree(size_t node_idx,
       searchKNNWithImplicitTree(node_idx * 2 + 2, query, k, next_dim, neighbor_idx, distances, dist2bbarr_cpy);
     }
 
-    //updateKNN<T>(query, curr_x, implicit_idx_tree_[node_idx], neighbor_idx, distances, k);
     checkQueue(query, k, neighbor_idx, distances);
 }
 
