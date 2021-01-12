@@ -60,3 +60,6 @@ idx, dist = kdt.searchKNN(query, k :int)
 idx, dist = kdt.searchRadius(query, radius :double)
 idx, dist = kdt.searchHyBrid(query, radius :double, max_k :int)
 ```
+
+## Also check out other 3D Image Processing related projects
+https://github.com/kristerseiya/ThreeDhee.git
