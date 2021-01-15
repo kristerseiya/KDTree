@@ -39,8 +39,9 @@ void ReadPLY(const std::string& filename, std::vector<Eigen::Vector3d>& points,
 
     FILE* fp = fopen(filename.c_str(), "rb");
     if (fp == nullptr) {
-        fprintf(stderr, "could not open file\n");
-        exit(1);
+        // fprintf(stderr, "could not open file\n");
+        // exit(1);
+        throw std::runtime_error("could not open file");
     }
 
     char buffer[100];
@@ -121,8 +122,9 @@ void ReadPLY(const std::string& filename, std::vector<Eigen::Vector3d>& points,
         } else if (strcmp(property_type,"uchar")==0) {
             byte_size += sizeof(unsigned char);
         } else {
-            fprintf(stderr,"unknown property type\n");
-            exit(1);
+            // fprintf(stderr,"unknown property type\n");
+            // exit(1);
+            throw std::runtime_error("unknown property type");
         }
         fgets(buffer, 99, fp);
     }
@@ -230,8 +232,9 @@ void ReadPLY(const std::string& filename, std::vector<Eigen::Vector3d>& points,
             sscanf(buffer, "%lf %lf %lf", &points[i][0], &points[i][1], &points[i][2]);
         }
     } else {
-        fprintf(stderr, "unknown format\n");
-        exit(1);
+        // fprintf(stderr, "unknown format\n");
+        // exit(1);
+        throw std::runtime_error("unknown format");
     }
 
     fclose(fp);
