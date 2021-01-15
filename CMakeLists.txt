@@ -13,14 +13,10 @@ set(CMAKE_CXX_FLAGS -O3)
 
 # EDIT PATHS ACCORDINGLY
 ############################
-if (NOT DEFINED PCDIO_PYTHON_INSTALL_PATH)
 set(KDTREE_PYTHON_INSTALL_PATH
   /Users/Krister/anaconda3/envs/python39/lib/python3.9/site-packages)
-endif()
 
-if (NOT DEFINED pybind11_FOUND)
 find_package(pybind11 REQUIRED HINTS /usr/local/opt/pybind11)
-endif()
 ############################
 
 

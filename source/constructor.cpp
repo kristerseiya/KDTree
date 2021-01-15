@@ -25,24 +25,6 @@ static bool canBuildCompleteBinaryTree(size_t num_nodes) {
   return true;
 }
 
-static int calcLeftRightBottomNodeDifferenceLeafOne(size_t num_nodes) {
-  int num_bottom_nodes = num_nodes;
-  int max_nodes_in_curr_level = 1;
-  while (num_bottom_nodes >= max_nodes_in_curr_level) {
-    num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
-    max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
-  }
-  int left_num_bottom_nodes = 0;
-  int right_num_bottom_nodes = 0;
-  if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
-    left_num_bottom_nodes = max_nodes_in_curr_level / 2;
-    right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
-  } else {
-    left_num_bottom_nodes = num_bottom_nodes;
-    right_num_bottom_nodes = 0;
-  }
-  return left_num_bottom_nodes - right_num_bottom_nodes;
-}
 
 static size_t computeLeafNodeStartIndex(size_t num_nodes, size_t leaf_size) {
     // if (leaf_size == 1) {
@@ -50,25 +32,6 @@ static size_t computeLeafNodeStartIndex(size_t num_nodes, size_t leaf_size) {
     // }
     size_t num_leaf_nodes = (num_nodes + 1) / (1 + leaf_size);
     return num_leaf_nodes - 1;
-}
-
-static int calcSplitLeafOne(size_t num_nodes) {
-  int num_bottom_nodes = num_nodes;
-  int max_nodes_in_curr_level = 1;
-  while (num_bottom_nodes >= max_nodes_in_curr_level) {
-    num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level;
-    max_nodes_in_curr_level = max_nodes_in_curr_level * 2;
-  }
-  int left_num_bottom_nodes = 0;
-  int right_num_bottom_nodes = 0;
-  if (num_bottom_nodes > max_nodes_in_curr_level / 2) {
-    left_num_bottom_nodes = max_nodes_in_curr_level / 2;
-    right_num_bottom_nodes = num_bottom_nodes - max_nodes_in_curr_level / 2;
-  } else {
-    left_num_bottom_nodes = num_bottom_nodes;
-    right_num_bottom_nodes = 0;
-  }
-  return left_num_bottom_nodes + (max_nodes_in_curr_level - 2) / 2;
 }
 
 static size_t calcSplit(size_t num_nodes, size_t leaf_size) {
@@ -227,6 +190,7 @@ void KDTree<T>::assign(const T* data, int dim, size_t num, int leaf_size /* = 1 
   if ((copied_)&&(data_)) {
       free((T*)data_);
   }
+
   if (!copy) {
     data_ = data;
     copied_ = false;
@@ -258,4 +222,4 @@ bool KDTree<T>::isCopied() {
   return copied_;
 }
 
-#include "kdtree.cpp"
+#include "search.cpp"
